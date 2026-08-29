@@ -100,3 +100,12 @@ Para tocar solo el renderer sin Electron (ej. iterar rápido en una pantalla): `
 ## Manejo de la API key
 
 No hay `.env` para la key de AssemblyAI. Se ingresa una vez desde la propia app (pantalla de configuración inicial), se cifra con `safeStorage` de Electron (Keychain en macOS, DPAPI en Windows) y se guarda en la carpeta de datos de usuario de la app — nunca en el repo ni en el paquete distribuido.
+
+---
+
+## Pendiente / TODO
+
+- **`electron-builder`**: instalado pero sin configurar. Falta el bloque `build` en `package.json` (appId, targets Windows/macOS, íconos) para poder generar un instalador — no bloquea el desarrollo actual. Ojo: su carpeta de salida por defecto es `dist/`, la misma que usa la compilación de TypeScript del main — hay que redirigirla (ej. a `release/`) para no pisarla.
+- **Tests**: el script `npm test` es un placeholder, no hay suite de pruebas todavía.
+- **Lint del proceso main**: `renderer/` tiene ESLint configurado (vía `create-next-app`); `main/` no tiene lint propio todavía.
+- Pantallas del MVP y pipeline de transcripción: ver el flujo completo y qué falta en `Planning.md` sección 12.

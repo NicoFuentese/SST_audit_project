@@ -1,21 +1,24 @@
 "use client";
 import { useState, useEffect } from "react";
+import OnboardingScreen from "./components/OnboardingScreen";
+import MainScreen from "./components/MainScreen";
 
 export default function Home() {
-  const [key, setKey] = useState("");
-  const [saved, setSaved] = useState<string | null>(null);
+  const [ready, setReady] = useState(false);
+  const [hasApiKey, setHasApiKey] = useState(false);
 
   useEffect(() => {
-    window.api.getApiKey().then(setSaved);
+    window.api.getApiKey().then((key) => {
+      setHasApiKey(!!key);
+      setReady(true);
+    });
   }, []);
 
-  return (
-    <div style={{ padding: 40 }}>
-      <p>Key guardada actualmente: {saved ?? "(ninguna)"}</p>
-      <input value={key} onChange={(e) => setKey(e.target.value)} placeholder="API key" />
-      <button onClick={() => window.api.setApiKey(key).then(() => setSaved(key))}>
-        Guardar
-      </button>
-    </div>
-  );
+  if (!ready) return null;
+
+  if (!hasApiKey) {
+    return <OnboardingScreen onComplete={() => setHasApiKey(true)} />;
+  }
+
+  return <MainScreen />;
 }
