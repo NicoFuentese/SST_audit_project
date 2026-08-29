@@ -1,6 +1,7 @@
 # Documentación interna (no se versiona)
 Planning.md
 CLAUDE.md
+AGENTS.md
 
 # Dependencias
 node_modules/

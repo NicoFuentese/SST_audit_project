@@ -18,7 +18,9 @@
   },
   "homepage": "https://github.com/NicoFuentese/SST_audit_project#readme",
   "devDependencies": {
+    "@types/node": "^26.4.0",
     "electron": "^44.0.0",
-    "electron-builder": "^26.15.3"
+    "electron-builder": "^26.15.3",
+    "typescript": "^7.0.2"
   }
 }
