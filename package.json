@@ -2,8 +2,13 @@
   "name": "sst_audit_project",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/main/main.js",
   "scripts": {
+    "build:main": "tsc -p main/tsconfig.json",
+    "watch:main": "tsc -p main/tsconfig.json --watch",
+    "dev:renderer": "npm run dev --prefix renderer",
+    "dev:electron": "wait-on tcp:3000 && electron dist/main/main.js",
+    "dev": "npm run build:main && concurrently -k \"npm:watch:main\" \"npm:dev:renderer\" \"npm:dev:electron\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -19,8 +24,10 @@
   "homepage": "https://github.com/NicoFuentese/SST_audit_project#readme",
   "devDependencies": {
     "@types/node": "^26.4.0",
+    "concurrently": "^10.0.5",
     "electron": "^44.0.0",
     "electron-builder": "^26.15.3",
-    "typescript": "^7.0.2"
+    "typescript": "^7.0.2",
+    "wait-on": "^9.1.0"
   }
 }
