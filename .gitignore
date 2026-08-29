@@ -1,0 +1,58 @@
+# Documentación interna (no se versiona)
+Planning.md
+CLAUDE.md
+
+# Dependencias
+node_modules/
+.pnp
+.pnp.js
+
+# Next.js (renderer)
+renderer/.next/
+renderer/out/
+.next/
+out/
+
+# Electron build / empaquetado
+dist/
+dist-electron/
+release/
+build/
+*.tsbuildinfo
+
+# Variables de entorno / secretos
+# (la API key compartida se guarda cifrada vía safeStorage en userData,
+# no en el repo — pero igual se ignora cualquier .env usado en desarrollo local)
+.env
+.env.local
+.env.*.local
+
+# Audio temporal generado durante desarrollo/pruebas
+tmp-audio/
+*.wav
+*.webm
+!renderer/public/**/*.webm
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+logs/
+*.log
+
+# Tests / cobertura
+coverage/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Editores / IDE
+.vscode/
+.idea/
+*.swp
+
+# Electron-builder cache
+.cache/
