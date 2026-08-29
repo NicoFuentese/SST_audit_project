@@ -29,5 +29,8 @@
     "electron-builder": "^26.15.3",
     "typescript": "^7.0.2",
     "wait-on": "^9.1.0"
+  },
+  "dependencies": {
+    "assemblyai": "^4.37.0"
   }
 }
