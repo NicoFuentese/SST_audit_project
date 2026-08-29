@@ -1,4 +1,5 @@
 import { app, BrowserWindow } from "electron";
+import { registerApiKeyHandlers } from "./ipc/apiKey";
 import path from "path";
 
 const isDev = !app.isPackaged;
@@ -21,7 +22,10 @@ function createWindow() {
   }
 }
 
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+  registerApiKeyHandlers();
+  createWindow();
+});
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") app.quit();

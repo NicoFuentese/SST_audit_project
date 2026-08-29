@@ -1,5 +1,6 @@
-import { contextBridge } from "electron";
+import { contextBridge, ipcRenderer } from "electron";
 
 contextBridge.exposeInMainWorld("api", {
-  // acá se van a exponer las funciones puntuales (getApiKey, setApiKey, etc.)
+  getApiKey: () => ipcRenderer.invoke("api-key:get"),
+  setApiKey: (key: string) => ipcRenderer.invoke("api-key:set", key),
 });
