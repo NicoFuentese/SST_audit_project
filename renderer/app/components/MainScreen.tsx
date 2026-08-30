@@ -1,5 +1,5 @@
 "use client";
-import { Mic, FolderOpen, Settings } from "lucide-react";
+import { Mic, FolderOpen, Settings, AudioLines } from "lucide-react";
 import ActionCard from "./ui/ActionCard";
 
 // Pantalla principal (sección 12, punto 2, del Planning.md). Sin historial:
@@ -11,7 +11,10 @@ export default function MainScreen({ onOpenSettings }: { onOpenSettings: () => v
     <div className="flex min-h-screen flex-col px-12 py-10">
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-4xl font-semibold tracking-tight">Nueva transcripción</h1>
+          <div className="flex items-center gap-3">
+            <AudioLines size={34} strokeWidth={1.5} className="text-accent" />
+            <h1 className="text-4xl font-semibold tracking-tight">Nueva transcripción</h1>
+          </div>
           <p className="mt-3 text-lg italic tracking-tight text-accent/70">
             Graba una reunión o carga un archivo de audio ya grabado.
           </p>
