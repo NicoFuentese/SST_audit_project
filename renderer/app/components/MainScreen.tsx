@@ -12,7 +12,7 @@ export default function MainScreen({ onOpenSettings }: { onOpenSettings: () => v
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-4xl font-semibold tracking-tight">Nueva transcripción</h1>
-          <p className="mt-2 text-sm text-neutral-500">
+          <p className="mt-3 text-lg italic tracking-tight text-accent/70">
             Graba una reunión o carga un archivo de audio ya grabado.
           </p>
         </div>
