@@ -8,4 +8,6 @@ contextBridge.exposeInMainWorld("api", {
   // webUtils.getPathForFile es el reemplazo oficial, y solo se puede llamar
   // desde el preload (no está disponible en el renderer aislado).
   getFilePath: (file: File) => webUtils.getPathForFile(file),
+  saveRecording: (buffer: ArrayBuffer, extension: string) =>
+    ipcRenderer.invoke("recording:save", buffer, extension),
 });

@@ -1,5 +1,6 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, session, desktopCapturer } from "electron";
 import { registerApiKeyHandlers } from "./ipc/apiKey";
+import { registerRecordingHandlers } from "./ipc/recording";
 import path from "path";
 
 // Sin esto, al correr "electron dist/main/main.js" sin empaquetar, Electron no
@@ -33,6 +34,23 @@ function createWindow() {
 
 app.whenReady().then(() => {
   registerApiKeyHandlers();
+  registerRecordingHandlers();
+
+  // getDisplayMedia no funciona "solo" en Electron como en un navegador —
+  // hay que decidir nosotros qué se comparte. audio: "loopback" es lo que
+  // habilita capturar el audio del sistema (WASAPI en Windows, equivalente
+  // en macOS). useSystemPicker delega al picker nativo del SO cuando está
+  // disponible (hoy: macOS 15+); en Windows no hay picker visible — se elige
+  // la pantalla automáticamente, sin diálogo.
+  session.defaultSession.setDisplayMediaRequestHandler(
+    (_request, callback) => {
+      desktopCapturer.getSources({ types: ["screen"] }).then((sources) => {
+        callback({ video: sources[0], audio: "loopback" });
+      });
+    },
+    { useSystemPicker: true }
+  );
+
   createWindow();
 });
 

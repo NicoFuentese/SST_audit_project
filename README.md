@@ -6,7 +6,7 @@ No genera resúmenes ni usa agentes de IA: el objetivo es una transcripción com
 
 El diseño completo — problema, evaluación de proveedores, arquitectura, stack, decisiones y flujo de pantallas — está documentado en **[`Planning.md`](./Planning.md)**. Este README cubre solo lo operativo: cómo correr y desarrollar el proyecto.
 
-> **Estado:** en desarrollo activo (MVP). Esqueleto técnico funcionando (Electron + Next.js + IPC + `safeStorage`), sistema de diseño definido, y 3 de las 6 pantallas del flujo ya construidas — ver tabla de estado más abajo.
+> **Estado:** en desarrollo activo (MVP). Esqueleto técnico funcionando (Electron + Next.js + IPC + `safeStorage`), sistema de diseño definido, captura de audio real (mic + sistema) funcionando, y 5 de las 8 pantallas del flujo ya construidas — ver tabla de estado más abajo.
 
 ---
 
@@ -36,15 +36,15 @@ Proveedor de transcripción + diarización: **AssemblyAI** (no OpenAI — ver ju
 
 ```
 ├── main/                    # Proceso main de Electron (TypeScript, compila a dist/main/)
-│   ├── main.ts               # Entry point: crea la ventana, carga dev/prod
+│   ├── main.ts               # Entry point: crea la ventana, carga dev/prod, setDisplayMediaRequestHandler
 │   ├── preload.ts            # contextBridge: única puerta de entrada del renderer al main
-│   ├── ipc/                  # Handlers de IPC organizados por dominio (ej. apiKey.ts)
+│   ├── ipc/                  # Handlers de IPC por dominio (apiKey.ts, recording.ts)
 │   └── tsconfig.json
 ├── renderer/                 # Next.js (proyecto npm independiente, su propio package.json)
 │   ├── app/
-│   │   ├── page.tsx            # Orquesta qué pantalla mostrar (onboarding/main/settings)
-│   │   ├── components/         # Pantallas (OnboardingScreen, MainScreen, SettingsScreen, ApiKeyForm)
-│   │   └── components/ui/      # Sistema de diseño: Button, Input, Card, ActionCard, CenteredPage
+│   │   ├── page.tsx            # Orquesta qué pantalla mostrar (state machine simple)
+│   │   ├── components/         # Pantallas: Onboarding, Main, Settings, Upload, Recording, Processing, ApiKeyForm
+│   │   └── components/ui/      # Sistema de diseño: Button, Input, Card, ActionCard, CenteredPage, Waveform
 │   └── types/electron.d.ts    # Tipado de `window.api` expuesto por el preload
 ├── dist/main/                # Salida compilada del proceso main (ignorado por git)
 └── Planning.md                # Documento de diseño completo
@@ -99,11 +99,27 @@ Scripts individuales disponibles (todos en el `package.json` raíz):
 
 Para tocar solo el renderer sin Electron (ej. iterar rápido en una pantalla): `npm run dev --prefix renderer` y abre `http://localhost:3000` directo en un navegador Chromium — funciona para lo visual, pero `window.api` no va a existir fuera de Electron (cualquier pantalla que dependa de IPC va a fallar ahí, es normal).
 
+**Ojo con esto**: cambios en `main/` o en `preload.ts` **no se recargan solos**. `watch:main` recompila el archivo en disco, pero la ventana de Electron ya abierta sigue con el preload/proceso main que cargó al crearse — a diferencia del renderer, que sí tiene hot reload. Si algo que tocaste en `main/`/`preload.ts` no parece estar funcionando, corta `npm run dev` por completo y vuelve a correrlo antes de asumir que hay un bug.
+
 ---
 
 ## Manejo de la API key
 
 No hay `.env` para la key de AssemblyAI. Se ingresa una vez desde la propia app (pantalla de configuración inicial), se cifra con `safeStorage` de Electron (Keychain en macOS, DPAPI en Windows) y se guarda en la carpeta de datos de usuario de la app — nunca en el repo ni en el paquete distribuido.
+
+---
+
+## Captura de audio y grabaciones
+
+La grabación combina dos fuentes: `getUserMedia` (micrófono) y `getDisplayMedia` (audio del sistema, capturado en modo `loopback`). Un detalle propio de Electron a tener presente: `getDisplayMedia` **no funciona solo** como en un navegador — hay que registrar `session.defaultSession.setDisplayMediaRequestHandler` en `main.ts`, que es quien decide qué se comparte (en Windows, sin diálogo visible; en macOS 15+, delega al picker nativo del sistema vía `useSystemPicker`).
+
+Las dos fuentes se mezclan con Web Audio API (`MediaStreamAudioDestinationNode`) y se graban con `MediaRecorder` en `webm/opus`. El archivo resultante se guarda en:
+
+```
+<userData>/recordings/reunion-<timestamp>.webm
+```
+
+En Windows, eso es `%APPDATA%\transcripcion-reuniones\recordings\`. Es una carpeta **temporal** — todavía no existe la limpieza automática (ver TODO), así que los archivos se van a acumular ahí hasta que se conecte el pipeline real con AssemblyAI y su borrado (`Planning.md` sección 3).
 
 ---
 
@@ -124,10 +140,10 @@ Flujo completo definido en `Planning.md` sección 12. Estado actual:
 | # | Pantalla | Estado |
 |---|---|---|
 | 1 | Configuración inicial (API key + validación) | ✅ Construida |
-| 2 | Pantalla principal (Grabar / Cargar archivo) | ✅ Construida — botones de acción deshabilitados hasta implementar 3a/3b |
-| 3a | Grabando | 🔲 Pendiente |
-| 3b | Cargar archivo | 🔲 Pendiente — siguiente en la fila |
-| 3c | Procesando | 🔲 Pendiente |
+| 2 | Pantalla principal (Grabar / Cargar archivo) | ✅ Construida |
+| 3a | Grabando | ✅ Construida — captura mic + sistema, cronómetro, waveform en vivo. Falta minimizar a bandeja del sistema (ver TODO) |
+| 3b | Cargar archivo | ✅ Construida — drag & drop + selector |
+| 3c | Procesando | 🔲 Pendiente — siguiente en la fila. Hoy ambos flujos (3a y 3b) caen en un placeholder |
 | 4 | Renombrado de speakers | 🔲 Pendiente |
 | 5 | Exportación | 🔲 Pendiente |
 | 6 | Configuración / editar API key | ✅ Construida |
@@ -142,3 +158,6 @@ Sistema de diseño (paleta, tipografía, componentes base) documentado en `Plann
 - **Tests**: el script `npm test` es un placeholder, no hay suite de pruebas todavía.
 - **Lint del proceso main**: `renderer/` tiene ESLint configurado (vía `create-next-app`); `main/` no tiene lint propio todavía.
 - **Modo simulación**: hoy solo cubre la validación de la API key (ver arriba). Evaluar extenderlo al pipeline de transcripción (datos simulados) cuando se construya, para poder probar el flujo completo sin gastar créditos de AssemblyAI.
+- **Bandeja del sistema (Tray)**: la pantalla de Grabar reunión (3a) todavía no se puede minimizar a la bandeja del sistema mientras graba, como pide `Planning.md` sección 12 — quedó deliberadamente fuera para priorizar validar que la captura de audio funcionara bien primero.
+- **Limpieza de grabaciones**: los archivos en `<userData>/recordings/` se acumulan sin borrarse — falta implementar el borrado automático (local + remoto en AssemblyAI) una vez que el pipeline de transcripción esté conectado (`Planning.md` sección 3).
+- **Almacenamiento permanente de audio (carpeta elegida por el usuario)**: evaluado y descartado por ahora — detalle de por qué y qué implicaría en `Planning.md` sección 10.

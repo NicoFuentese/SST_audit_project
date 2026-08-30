@@ -4,9 +4,10 @@ import OnboardingScreen from "./components/OnboardingScreen";
 import MainScreen from "./components/MainScreen";
 import SettingsScreen from "./components/SettingsScreen";
 import UploadScreen from "./components/UploadScreen";
+import RecordingScreen from "./components/RecordingScreen";
 import ProcessingScreen from "./components/ProcessingScreen";
 
-type Screen = "loading" | "onboarding" | "main" | "settings" | "upload" | "processing";
+type Screen = "loading" | "onboarding" | "main" | "settings" | "upload" | "recording" | "processing";
 
 export default function Home() {
   const [screen, setScreen] = useState<Screen>("loading");
@@ -40,6 +41,18 @@ export default function Home() {
     );
   }
 
+  if (screen === "recording") {
+    return (
+      <RecordingScreen
+        onBack={() => setScreen("main")}
+        onContinue={(file) => {
+          setProcessingFileName(file.name);
+          setScreen("processing");
+        }}
+      />
+    );
+  }
+
   if (screen === "processing") {
     return <ProcessingScreen fileName={processingFileName} />;
   }
@@ -48,6 +61,7 @@ export default function Home() {
     <MainScreen
       onOpenSettings={() => setScreen("settings")}
       onSelectUpload={() => setScreen("upload")}
+      onSelectRecord={() => setScreen("recording")}
     />
   );
 }

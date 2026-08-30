@@ -7,6 +7,7 @@ declare global {
       setApiKey: (key: string) => Promise<boolean>;
       validateApiKey: (key: string) => Promise<{ valid: boolean; error?: string }>;
       getFilePath: (file: File) => string;
+      saveRecording: (buffer: ArrayBuffer, extension: string) => Promise<string>;
     };
   }
 }

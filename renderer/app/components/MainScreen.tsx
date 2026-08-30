@@ -9,9 +9,11 @@ import ActionCard from "./ui/ActionCard";
 export default function MainScreen({
   onOpenSettings,
   onSelectUpload,
+  onSelectRecord,
 }: {
   onOpenSettings: () => void;
   onSelectUpload: () => void;
+  onSelectRecord: () => void;
 }) {
   return (
     <div className="flex min-h-screen flex-col px-8 py-10">
@@ -42,8 +44,7 @@ export default function MainScreen({
             icon={<Mic size={24} />}
             title="Grabar reunión"
             description="Captura micrófono + audio del sistema"
-            disabled
-            badge="Próximamente"
+            onClick={onSelectRecord}
           />
           <ActionCard
             icon={<FolderOpen size={24} />}
