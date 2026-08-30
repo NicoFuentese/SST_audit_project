@@ -103,9 +103,20 @@ No hay `.env` para la key de AssemblyAI. Se ingresa una vez desde la propia app 
 
 ---
 
+## Modo simulación (solo desarrollo)
+
+Para probar el flujo/diseño de la app sin depender de una API key real de AssemblyAI, la pantalla de Configuración inicial acepta el string **`admin`** como key — pasa la validación sin llamar a la API real y deja avanzar a la pantalla principal.
+
+Gateado por `!app.isPackaged` (en `main/ipc/apiKey.ts`): esta rama **no existe** en un build empaquetado, así que no hay forma de que llegue a producción ni a un instalador distribuido. Solo funciona corriendo `npm run dev`.
+
+Cubre únicamente la validación de la key. Cuando se construya el pipeline real de transcripción (subida, poll, resultado), esa parte va a necesitar una key real de AssemblyAI para probarse de punta a punta — o, si se quiere seguir probando sin gastar créditos, extender esta misma idea con datos de transcripción simulados.
+
+---
+
 ## Pendiente / TODO
 
 - **`electron-builder`**: instalado pero sin configurar. Falta el bloque `build` en `package.json` (appId, targets Windows/macOS, íconos) para poder generar un instalador — no bloquea el desarrollo actual. Ojo: su carpeta de salida por defecto es `dist/`, la misma que usa la compilación de TypeScript del main — hay que redirigirla (ej. a `release/`) para no pisarla.
 - **Tests**: el script `npm test` es un placeholder, no hay suite de pruebas todavía.
 - **Lint del proceso main**: `renderer/` tiene ESLint configurado (vía `create-next-app`); `main/` no tiene lint propio todavía.
 - Pantallas del MVP y pipeline de transcripción: ver el flujo completo y qué falta en `Planning.md` sección 12.
+- **Modo simulación**: hoy solo cubre la validación de la API key (ver arriba). Evaluar extenderlo al pipeline de transcripción (datos simulados) cuando se construya, para poder probar el flujo completo sin gastar créditos de AssemblyAI.

@@ -22,6 +22,14 @@ export function registerApiKeyHandlers() {
   // Llamada liviana y sin costo (solo lista, no procesa audio) para confirmar
   // que la key es válida antes de dejar continuar al usuario.
   ipcMain.handle("api-key:validate", async (_event, apiKey: string) => {
+    // Atajo SOLO de desarrollo: simula una key válida sin llamar a AssemblyAI,
+    // para poder probar el flujo/diseño de la app sin una key real todavía.
+    // Gateado por app.isPackaged: en un build empaquetado esta rama no existe
+    // (isPackaged siempre es true ahí), así que no puede llegar a producción.
+    if (!app.isPackaged && apiKey === "admin") {
+      return { valid: true };
+    }
+
     try {
       const client = new AssemblyAI({ apiKey });
       await client.transcripts.list({ limit: 1 });

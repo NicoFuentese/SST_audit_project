@@ -3,11 +3,17 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  /* Acento "celeste minimalista" (paleta sky de Tailwind), usado solo para
+     acciones primarias, estados activos/progreso y foco de inputs. */
+  --accent: #0284c7; /* sky-600 */
+  --accent-hover: #0369a1; /* sky-700 */
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -16,6 +22,8 @@
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --accent: #38bdf8; /* sky-400, más claro para contraste sobre fondo oscuro */
+    --accent-hover: #7dd3fc; /* sky-300 */
   }
 }
 

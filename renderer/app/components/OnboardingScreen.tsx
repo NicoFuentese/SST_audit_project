@@ -1,5 +1,10 @@
 "use client";
 import { useState } from "react";
+import { KeyRound } from "lucide-react";
+import CenteredPage from "./ui/CenteredPage";
+import Card from "./ui/Card";
+import Input from "./ui/Input";
+import Button from "./ui/Button";
 
 type Status = "idle" | "validating" | "error";
 
@@ -27,36 +32,36 @@ export default function OnboardingScreen({ onComplete }: { onComplete: () => voi
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
-      <div className="w-full max-w-sm space-y-4 rounded-lg border border-neutral-200 p-8 dark:border-neutral-700">
-        <div className="space-y-1">
+    <CenteredPage>
+      <Card>
+        <div className="flex items-center gap-2">
+          <KeyRound size={20} className="text-accent" />
           <h1 className="text-lg font-semibold">Configuración inicial</h1>
-          <p className="text-sm text-neutral-500">
-            Ingresa la API key de AssemblyAI del equipo para comenzar. Se valida antes de
-            continuar y luego queda guardada de forma cifrada en este equipo.
-          </p>
         </div>
+        <p className="text-sm text-neutral-500">
+          Ingresa la API key de AssemblyAI del equipo para comenzar. Se valida antes de
+          continuar y luego queda guardada de forma cifrada en este equipo.
+        </p>
 
-        <input
+        <Input
           type="password"
           value={apiKey}
           onChange={(e) => setApiKey(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleContinue()}
           placeholder="API key de AssemblyAI"
           disabled={status === "validating"}
-          className="w-full rounded border border-neutral-300 bg-transparent px-3 py-2 text-sm outline-none focus:border-neutral-500 disabled:opacity-50 dark:border-neutral-600"
         />
 
         {status === "error" && <p className="text-sm text-red-500">{errorMessage}</p>}
 
-        <button
+        <Button
           onClick={handleContinue}
           disabled={status === "validating" || !apiKey.trim()}
-          className="w-full rounded bg-neutral-900 py-2 text-sm font-medium text-white transition disabled:opacity-50 dark:bg-neutral-100 dark:text-neutral-900"
+          className="w-full"
         >
           {status === "validating" ? "Validando..." : "Continuar"}
-        </button>
-      </div>
-    </div>
+        </Button>
+      </Card>
+    </CenteredPage>
   );
 }
