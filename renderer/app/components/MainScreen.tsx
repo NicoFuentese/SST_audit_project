@@ -6,7 +6,13 @@ import ActionCard from "./ui/ActionCard";
 // siempre parte "limpia". Un solo job activo a la vez — cuando exista estado
 // de grabación/procesamiento real, esta pantalla deberá reflejarlo en vez de
 // ofrecer las dos acciones (ver Planning.md sección 10).
-export default function MainScreen({ onOpenSettings }: { onOpenSettings: () => void }) {
+export default function MainScreen({
+  onOpenSettings,
+  onSelectUpload,
+}: {
+  onOpenSettings: () => void;
+  onSelectUpload: () => void;
+}) {
   return (
     <div className="flex min-h-screen flex-col px-8 py-10">
       <div className="flex justify-end">
@@ -43,8 +49,7 @@ export default function MainScreen({ onOpenSettings }: { onOpenSettings: () => v
             icon={<FolderOpen size={24} />}
             title="Cargar archivo"
             description="Sube un audio ya grabado"
-            disabled
-            badge="Próximamente"
+            onClick={onSelectUpload}
           />
         </div>
       </div>
