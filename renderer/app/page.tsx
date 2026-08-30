@@ -2,23 +2,28 @@
 import { useState, useEffect } from "react";
 import OnboardingScreen from "./components/OnboardingScreen";
 import MainScreen from "./components/MainScreen";
+import SettingsScreen from "./components/SettingsScreen";
+
+type Screen = "loading" | "onboarding" | "main" | "settings";
 
 export default function Home() {
-  const [ready, setReady] = useState(false);
-  const [hasApiKey, setHasApiKey] = useState(false);
+  const [screen, setScreen] = useState<Screen>("loading");
 
   useEffect(() => {
     window.api.getApiKey().then((key) => {
-      setHasApiKey(!!key);
-      setReady(true);
+      setScreen(key ? "main" : "onboarding");
     });
   }, []);
 
-  if (!ready) return null;
+  if (screen === "loading") return null;
 
-  if (!hasApiKey) {
-    return <OnboardingScreen onComplete={() => setHasApiKey(true)} />;
+  if (screen === "onboarding") {
+    return <OnboardingScreen onComplete={() => setScreen("main")} />;
   }
 
-  return <MainScreen />;
+  if (screen === "settings") {
+    return <SettingsScreen onBack={() => setScreen("main")} />;
+  }
+
+  return <MainScreen onOpenSettings={() => setScreen("settings")} />;
 }
