@@ -6,7 +6,7 @@ No genera resúmenes ni usa agentes de IA: el objetivo es una transcripción com
 
 El diseño completo — problema, evaluación de proveedores, arquitectura, stack, decisiones y flujo de pantallas — está documentado en **[`Planning.md`](./Planning.md)**. Este README cubre solo lo operativo: cómo correr y desarrollar el proyecto.
 
-> **Estado:** en desarrollo activo (MVP). El esqueleto técnico (Electron + Next.js + IPC + almacenamiento cifrado de la API key) ya está funcionando; las pantallas y el pipeline de transcripción se están construyendo.
+> **Estado:** en desarrollo activo (MVP). Esqueleto técnico funcionando (Electron + Next.js + IPC + `safeStorage`), sistema de diseño definido, y 3 de las 6 pantallas del flujo ya construidas — ver tabla de estado más abajo.
 
 ---
 
@@ -25,6 +25,7 @@ TypeScript de punta a punta — sin backend separado. La lógica sensible (API k
 | Tailwind CSS (renderer) | ^4 |
 | electron-builder | ^26.15.3 *(instalado, aún sin configurar — ver TODO)* |
 | SDK de AssemblyAI (Node) | ^4.37.0 |
+| lucide-react | íconos, usados en toda la UI |
 | concurrently / wait-on | orquestan `npm run dev` (Next + compilación del main + Electron en paralelo) |
 
 Proveedor de transcripción + diarización: **AssemblyAI** (no OpenAI — ver justificación técnica en `Planning.md` sección 6).
@@ -40,7 +41,10 @@ Proveedor de transcripción + diarización: **AssemblyAI** (no OpenAI — ver ju
 │   ├── ipc/                  # Handlers de IPC organizados por dominio (ej. apiKey.ts)
 │   └── tsconfig.json
 ├── renderer/                 # Next.js (proyecto npm independiente, su propio package.json)
-│   ├── app/                   # App Router (pantallas)
+│   ├── app/
+│   │   ├── page.tsx            # Orquesta qué pantalla mostrar (onboarding/main/settings)
+│   │   ├── components/         # Pantallas (OnboardingScreen, MainScreen, SettingsScreen, ApiKeyForm)
+│   │   └── components/ui/      # Sistema de diseño: Button, Input, Card, ActionCard, CenteredPage
 │   └── types/electron.d.ts    # Tipado de `window.api` expuesto por el preload
 ├── dist/main/                # Salida compilada del proceso main (ignorado por git)
 └── Planning.md                # Documento de diseño completo
@@ -113,10 +117,28 @@ Cubre únicamente la validación de la key. Cuando se construya el pipeline real
 
 ---
 
+## Estado de las pantallas
+
+Flujo completo definido en `Planning.md` sección 12. Estado actual:
+
+| # | Pantalla | Estado |
+|---|---|---|
+| 1 | Configuración inicial (API key + validación) | ✅ Construida |
+| 2 | Pantalla principal (Grabar / Cargar archivo) | ✅ Construida — botones de acción deshabilitados hasta implementar 3a/3b |
+| 3a | Grabando | 🔲 Pendiente |
+| 3b | Cargar archivo | 🔲 Pendiente — siguiente en la fila |
+| 3c | Procesando | 🔲 Pendiente |
+| 4 | Renombrado de speakers | 🔲 Pendiente |
+| 5 | Exportación | 🔲 Pendiente |
+| 6 | Configuración / editar API key | ✅ Construida |
+
+Sistema de diseño (paleta, tipografía, componentes base) documentado en `Planning.md` sección 12, con referencia visual de las 4 direcciones evaluadas.
+
+---
+
 ## Pendiente / TODO
 
 - **`electron-builder`**: instalado pero sin configurar. Falta el bloque `build` en `package.json` (appId, targets Windows/macOS, íconos) para poder generar un instalador — no bloquea el desarrollo actual. Ojo: su carpeta de salida por defecto es `dist/`, la misma que usa la compilación de TypeScript del main — hay que redirigirla (ej. a `release/`) para no pisarla.
 - **Tests**: el script `npm test` es un placeholder, no hay suite de pruebas todavía.
 - **Lint del proceso main**: `renderer/` tiene ESLint configurado (vía `create-next-app`); `main/` no tiene lint propio todavía.
-- Pantallas del MVP y pipeline de transcripción: ver el flujo completo y qué falta en `Planning.md` sección 12.
 - **Modo simulación**: hoy solo cubre la validación de la API key (ver arriba). Evaluar extenderlo al pipeline de transcripción (datos simulados) cuando se construya, para poder probar el flujo completo sin gastar créditos de AssemblyAI.
